@@ -586,14 +586,6 @@ fi
 
 > *Add your screenshots here once you've launched the dashboard!*
 
-Recommended screenshots to showcase:
-- Full dashboard view on 1920×1080
-- Full dashboard view on 2560×1440 or 4K
-- Individual widget closeups
-- Different background customizations
-
----
-
 <div align="center">
 
 ## 🙏 **Credits**
