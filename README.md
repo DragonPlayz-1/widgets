@@ -529,6 +529,37 @@ bindsym $mod+d exec ~/.config/eww/dashboard/launch_dashboard
 
 The username and profile image will be automatically detected using `whoami` - no changes needed!
 
+### Change Background Image
+
+To customize the dashboard background:
+
+```bash
+# Replace the background image
+cp your-wallpaper.png ~/.config/eww/dashboard/images/bg.png
+
+# Or use JPG (rename to .png)
+convert your-wallpaper.jpg ~/.config/eww/dashboard/images/bg.png
+
+# Reload EWW to apply changes
+eww reload
+```
+
+**Background Image Tips**:
+- **Recommended resolution**: Same as your display (e.g., 1920×1080, 2560×1440)
+- **Format**: PNG or JPG (converted to PNG)
+- **Name**: Must be named `bg.png` (or edit `eww.scss` line 9)
+- The image automatically scales to cover the entire screen using `background-size: cover`
+- **Fallback color**: If image fails to load, displays `#474D59` (gray-blue)
+
+**To change fallback color** (in `eww.scss`):
+```scss
+.bg {
+  background-image: url("images/bg.png");
+  background-color: #YOUR_COLOR_HERE;  /* Change this */
+  /* ... */
+}
+```
+
 ### Weather Setup (NO API KEY NEEDED!)
 
 The weather widget uses **Open-Meteo**, which is completely free and requires no API key!
@@ -538,8 +569,8 @@ The weather widget uses **Open-Meteo**, which is completely free and requires no
 nano ~/.config/eww/dashboard/scripts/weather_info
 
 # Update these lines with YOUR coordinates:
-LAT="26.7496"  # Your latitude
-LON="88.4434"  # Your longitude
+LAT="00.0000"  # Your latitude
+LON="00.0000"  # Your longitude
 UNIT="metric"  # or "imperial" for Fahrenheit
 ```
 
@@ -548,7 +579,7 @@ UNIT="metric"  # or "imperial" for Fahrenheit
 1. **Google Maps Method**:
    - Go to https://www.google.com/maps
    - Right-click your location → "What's here?"
-   - Copy the coordinates (e.g., "00.0000, 00.0000")
+   - Copy the coordinates (e.g., "26.7496, 88.4434")
 
 2. **Command Line Method**:
    ```bash
@@ -598,7 +629,7 @@ fi
 - **License**: GPL-3.0
 
 ### Customization
-- **Modified By**: Ishaan Gupta
+- **Modified By**: Ishaan Gupta ([@DragonPlayz-1](https://github.com/DragonPlayz-1))
 - **Year**: 2025
 - **Major Innovation**: 100% percentage-based positioning + viewport units (zero pixels!)
 - **Weather Integration**: Open-Meteo API (no API key required)
@@ -709,6 +740,27 @@ rm ~/.cache/eww_launch.dashboard
 ```
 </details>
 
+<details>
+<summary><b>Background image not showing</b></summary>
+
+**Check if image exists:**
+```bash
+ls -la ~/.config/eww/dashboard/images/bg.png
+```
+
+**If missing, add your own:**
+```bash
+cp /path/to/your/wallpaper.png ~/.config/eww/dashboard/images/bg.png
+eww reload
+```
+
+**Verify file permissions:**
+```bash
+chmod 644 ~/.config/eww/dashboard/images/bg.png
+```
+
+</details>
+
 ---
 
 <div align="center">
@@ -801,7 +853,7 @@ Contributions welcome! Please:
 If you found this customization helpful:
 - ⭐ **Star** this repository
 - 🔀 **Fork** and create your own variant
-- 📢 **Share** with the linux community
+- 📢 **Share** with the Linux community
 - 💬 **Post** your customized version with screenshots
 - ☕ **Support** the original author [@adi1090x](https://github.com/adi1090x)
 
@@ -813,7 +865,7 @@ If you found this customization helpful:
 
 </div>
 
-- **GitHub**: @DragonPlayz-1
+- **GitHub**: [@DragonPlayz-1](https://github.com/DragonPlayz-1)
 
 ---
 
@@ -822,7 +874,6 @@ If you found this customization helpful:
 <!-- Gradient Footer -->
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=150&section=footer&text=100%25%20Responsive%20%E2%80%A2%20Zero%20Pixels%20%E2%80%A2%20No%20GTK%20Errors%20%F0%9F%9A%80&fontSize=20&fontColor=fff&animation=fadeIn" />
 
-**[⬆ Back to Top](#)**
+<p><a href="#-about-this-fork">⬆️ Back to Top</a></p>
 
 </div>
-
