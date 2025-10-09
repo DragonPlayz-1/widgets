@@ -50,6 +50,7 @@ This is a heavily customized version of the **Dashboard widget** from [adi1090x/
 - Margins/padding: vw units for perfect scaling
 - Tested on 1366×768, 1920×1080, 2560×1440, 4K
 - Works on ultrawide and portrait displays
+- **Fixes GTK monitor detection error** with `:monitor 0`
 
 </td>
 <td width="50%">
@@ -93,6 +94,47 @@ This is a heavily customized version of the **Dashboard widget** from [adi1090x/
 
 <div align="center">
 
+## 🔧 **Critical Bug Fix Included**
+
+</div>
+
+### The "Failed to get primary monitor from GTK" Error
+
+Many users encounter this error when opening EWW widgets:
+
+```
+Failed to open window 'example'.
+Caused by: Failed to get primary monitor from GTK. 
+Try explicitly specifying the monitor on your window.
+```
+
+**Our Solution**: Every window definition includes `:monitor 0` to explicitly specify the display:
+
+```lisp
+;; ❌ PROBLEMATIC (causes GTK monitor detection error):
+(defwindow profile
+  :geometry (geometry :x "5.5%" :y "14%" :width "18%" :height "41%")
+  (user))
+
+;; ✅ FIXED (explicitly specifies monitor):
+(defwindow profile
+  :monitor 0  # ← This fixes the GTK monitor detection error!
+  :geometry (geometry :x "5.5%" :y "14%" :width "18%" :height "41%")
+  (user))
+```
+
+**What `:monitor 0` does**:
+- Explicitly tells EWW to display on monitor index 0 (primary display)
+- Bypasses GTK's automatic monitor detection (which often fails on Wayland)
+- Works on both X11 and Wayland compositors
+- Compatible with Hyprland, Sway, i3, and other window managers
+
+**For multiple monitors**: Change `:monitor 0` to `:monitor 1`, `:monitor 2`, etc.
+
+---
+
+<div align="center">
+
 ## 📐 **Universal Resolution Magic**
 
 </div>
@@ -109,17 +151,19 @@ All windows use **percentage coordinates** instead of fixed pixels:
 (defwindow profile :geometry (geometry :x 150 :y 150 :width 350 :height 440))
 
 ;; ✅ NEW METHOD (Percentages - works on ANY resolution):
-(defwindow profile :geometry (geometry :x "7.8%" :y "13.9%" :width "18.2%" :height "40.7%"))
+(defwindow profile 
+  :monitor 0  # Fixes GTK monitor detection
+  :geometry (geometry :x "7.8%" :y "13.9%" :width "18.2%" :height "40.7%"))
 ```
 
 #### 2. Widget Styling (eww.scss)
 All sizes use **viewport width (vw) units** - no pixels anywhere:
 
 ```scss
-/* ❌ OLD METHOD (Fixed pixels):
+/* ❌ OLD METHOD (Fixed pixels): */
 .time_hour { font-size: 56px; margin: 8px; }
 
-/* ✅ NEW METHOD (Viewport units):
+/* ✅ NEW METHOD (Viewport units): */
 .time_hour { font-size: 4vw; margin: 0.6vw; }
 ```
 
@@ -135,7 +179,7 @@ All sizes use **viewport width (vw) units** - no pixels anywhere:
 | **3840×2160** | 16:9 | ✅ Perfect | 4K/UHD displays |
 | **2560×1080** | 21:9 | ✅ Works | Ultrawide (proportional scaling) |
 | **1920×1200** | 16:10 | ✅ Works | Slightly different proportions |
-| **Portrait** | Various | ❌ Probably Not (not tested) | Designed for landscape |
+| **Portrait** | Various | ⚠️ Not Tested | Designed for landscape |
 
 ### Why This Works
 
@@ -316,11 +360,11 @@ All sizes use **viewport width (vw) units** - no pixels anywhere:
 <details>
 <summary><b>🪟 Window Definitions - THE GAME CHANGER</b></summary>
 
-#### Revolutionary Change: 100% Percentage-Based Positioning
+#### Revolutionary Change: 100% Percentage-Based Positioning + Monitor Fix
 
 This is the single most important customization that makes the dashboard universal!
 
-**All Widget Positions (Percentage-Based)**:
+**All Widget Positions (Percentage-Based with `:monitor 0` fix)**:
 
 | Widget | X Position | Y Position | Width | Height |
 |--------|-----------|-----------|--------|---------|
@@ -344,13 +388,20 @@ This is the single most important customization that makes the dashboard univers
 | **Poweroff** | 84% | 30% | 8% | 14.5% |
 | **Folders** | 75.5% | 45.5% | 17% | 41% |
 
-**Example**:
+**Example with monitor fix**:
 ```lisp
-;; ANY resolution - automatically adapts:
-(defwindow profile :geometry (geometry :x "5.5%" :y "14%" :width "18%" :height "41%"))
+;; Includes :monitor 0 to prevent GTK errors - works on ANY resolution:
+(defwindow profile 
+  :stacking "fg" 
+  :focusable "false" 
+  :monitor 0  # ← Critical: Prevents "Failed to get primary monitor" error
+  :geometry (geometry :x "5.5%" :y "14%" :width "18%" :height "41%")
+  (user))
 ```
 
-**Why?** Zero pixels means zero alignment issues on ANY screen resolution!
+**Why?** 
+- Zero pixels = zero alignment issues on ANY screen resolution!
+- `:monitor 0` = no more GTK monitor detection errors!
 
 </details>
 
@@ -429,13 +480,18 @@ All widget styles use **vw units** for:
 
 ### Prerequisites
 ```bash
-Install EWW (Elkowar's Wacky Widgets)
+# Install EWW (Elkowar's Wacky Widgets)
 # Follow instructions at: https://elkowar.github.io/eww
 ```
 
 ### Quick Setup
 ```bash
-Use install.sh script provided. It will automatically install all required things.
+# Use install.sh script provided
+# It will automatically install all required dependencies
+
+chmod +x install.sh
+./install.sh
+```
 
 ### Launch Dashboard
 ```bash
@@ -558,6 +614,7 @@ Recommended screenshots to showcase:
 - **Year**: 2025
 - **Major Innovation**: 100% percentage-based positioning + viewport units (zero pixels!)
 - **Weather Integration**: Open-Meteo API (no API key required)
+- **Bug Fix**: GTK monitor detection error fix with `:monitor 0`
 - **Changes**: See [Detailed Customization Log](#-detailed-customization-log)
 
 ### EWW Framework
@@ -605,6 +662,35 @@ Full license: [LICENSE](LICENSE)
 ## 🐛 **Troubleshooting**
 
 </div>
+
+<details>
+<summary><b>❌ "Failed to get primary monitor from GTK" Error</b></summary>
+
+**Error Message**:
+```
+Failed to open window 'example'.
+Caused by: Failed to get primary monitor from GTK. 
+Try explicitly specifying the monitor on your window.
+```
+
+**Solution**: This dashboard **already includes the fix**! Every window has `:monitor 0`:
+
+```lisp
+(defwindow yourwindow
+  :monitor 0  # ← This line prevents the error!
+  :geometry (geometry ...)
+  (content))
+```
+
+**If you're customizing and encounter this error**: Simply add `:monitor 0` after `(defwindow windowname`
+
+**For multiple monitors**:
+- `:monitor 0` = Primary display
+- `:monitor 1` = Second monitor
+- `:monitor 2` = Third monitor
+- etc.
+
+</details>
 
 <details>
 <summary><b>Dashboard doesn't appear</b></summary>
@@ -778,9 +864,10 @@ Contributions welcome! Please:
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
 3. **Test on multiple resolutions** (minimum: 1920×1080 and 2560×1440)
 4. **Maintain 100% responsive design** (no pixel values!)
-5. Commit changes (`git commit -m 'Add: Amazing new feature'`)
-6. Push to branch (`git push origin feature/AmazingFeature`)
-7. Open a Pull Request with screenshots
+5. **Include `:monitor 0`** in all window definitions
+6. Commit changes (`git commit -m 'Add: Amazing new feature'`)
+7. Push to branch (`git push origin feature/AmazingFeature`)
+8. Open a Pull Request with screenshots
 
 ### Contribution Ideas
 - New widget designs (using vw/percentage units!)
@@ -822,8 +909,9 @@ If you found this customization helpful:
 <div align="center">
 
 <!-- Gradient Footer -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=150&section=footer&text=100%25%20Responsive%20%E2%80%A2%20Zero%20Pixels%20%F0%9F%9A%80&fontSize=24&fontColor=fff&animation=fadeIn" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=150&section=footer&text=100%25%20Responsive%20%E2%80%A2%20Zero%20Pixels%20%E2%80%A2%20No%20GTK%20Errors%20%F0%9F%9A%80&fontSize=20&fontColor=fff&animation=fadeIn" />
 
 **[⬆ Back to Top](#)**
 
 </div>
+
