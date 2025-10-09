@@ -478,11 +478,16 @@ All widget styles use **vw units** for:
 # Follow instructions at: https://elkowar.github.io/eww
 ```
 
-### Quick Setup
+### Quick Install
 ```bash
 # Use install.sh script provided
 # It will automatically install all required dependencies
 
+# Clone repository
+git clone https://github.com/DragonPlayz-1/widgets.git
+cd widgets/install
+
+# Make script executable and run
 chmod +x install.sh
 ./install.sh
 ```
@@ -909,15 +914,6 @@ Contributions welcome! Please:
 6. Commit changes (`git commit -m 'Add: Amazing new feature'`)
 7. Push to branch (`git push origin feature/AmazingFeature`)
 8. Open a Pull Request with screenshots
-
-### Contribution Ideas
-- New widget designs (using vw/percentage units!)
-- Additional quick-launch tiles
-- Alternative color schemes
-- Support for other Linux distros
-- Improved scripts
-- Alternative weather APIs
-
 ---
 
 <div align="center">
