@@ -314,9 +314,8 @@ All sizes use **viewport width (vw) units** - no pixels anywhere:
 4. **Mail Widget**: Simplified to icon-only (removed badge counter)
 
 **Layout**:
-| GitHub | Reddit | Perplexity | YouTube |
-|--------|--------|------------|---------|
-| **Mail** | **Google** | | |
+| GitHub | Reddit | Perplexity | YouTube | GMail | Google |
+|--------|--------|------------|---------|-------|--------|
 
 **Why?** Added frequently-used AI tool (Perplexity) and Google; streamlined mail widget.
 
@@ -586,6 +585,8 @@ fi
 
 > *Add your screenshots here once you've launched the dashboard!*
 
+---
+
 <div align="center">
 
 ## 🙏 **Credits**
@@ -598,12 +599,11 @@ fi
 - **License**: GPL-3.0
 
 ### Customization
-- **Modified By**: YOUR_NAME
+- **Modified By**: Ishaan Gupta
 - **Year**: 2025
 - **Major Innovation**: 100% percentage-based positioning + viewport units (zero pixels!)
 - **Weather Integration**: Open-Meteo API (no API key required)
 - **Bug Fix**: GTK monitor detection error fix with `:monitor 0`
-- **Changes**: See [Detailed Customization Log](#-detailed-customization-log)
 
 ### EWW Framework
 - **[@elkowar](https://github.com/elkowar)** - Creator of EWW (Elkowar's Wacky Widgets)
@@ -625,7 +625,7 @@ fi
 This customized version is released under the **GPL-3.0 License**, maintaining compliance with the original project's license.
 
 ```
-Copyright (C) 2025 YOUR_NAME
+Copyright (C) 2025 Ishaan Gupta
 Copyright (C) 2021-2024 Aditya Shakya (@adi1090x)
 
 This program is free software: you can redistribute it and/or modify
@@ -652,35 +652,6 @@ Full license: [LICENSE](LICENSE)
 </div>
 
 <details>
-<summary><b>❌ "Failed to get primary monitor from GTK" Error</b></summary>
-
-**Error Message**:
-```
-Failed to open window 'example'.
-Caused by: Failed to get primary monitor from GTK. 
-Try explicitly specifying the monitor on your window.
-```
-
-**Solution**: This dashboard **already includes the fix**! Every window has `:monitor 0`:
-
-```lisp
-(defwindow yourwindow
-  :monitor 0  # ← This line prevents the error!
-  :geometry (geometry ...)
-  (content))
-```
-
-**If you're customizing and encounter this error**: Simply add `:monitor 0` after `(defwindow windowname`
-
-**For multiple monitors**:
-- `:monitor 0` = Primary display
-- `:monitor 1` = Second monitor
-- `:monitor 2` = Third monitor
-- etc.
-
-</details>
-
-<details>
 <summary><b>Dashboard doesn't appear</b></summary>
 
 ```bash
@@ -694,18 +665,6 @@ eww logs
 eww kill
 ~/.config/eww/dashboard/launch_dashboard
 ```
-</details>
-
-<details>
-<summary><b>Widgets are overlapping or misaligned</b></summary>
-
-This should NOT happen with the 100% responsive design! If it does:
-
-1. **Check your EWW version**: Make sure you're running EWW 0.4.0+
-2. **Verify files**: Ensure both `eww.yuck` and `eww.scss` are using percentages/vw units
-3. **Test resolution**: Try `xrandr` to check your actual screen resolution
-4. **Restart EWW**: `eww kill && ~/.config/eww/dashboard/launch_dashboard`
-
 </details>
 
 <details>
@@ -735,39 +694,6 @@ This should NOT happen with the 100% responsive design! If it does:
    chmod 755 ~/.cache/eww/weather
    ```
 
-</details>
-
-<details>
-<summary><b>Icons not rendering (showing boxes/squares)</b></summary>
-
-```bash
-# Reinstall fonts
-cp -r fonts/* ~/.local/share/fonts/
-fc-cache -fv
-
-# Check font installation
-fc-list | grep Iosevka
-fc-list | grep Feather
-
-# If still not working, install from system packages
-sudo pacman -S ttf-iosevka-nerd ttf-font-awesome  # Arch
-sudo apt install fonts-iosevka fonts-font-awesome  # Debian/Ubuntu
-```
-</details>
-
-<details>
-<summary><b>SVG images (Perplexity/Google) not showing</b></summary>
-
-Ensure the SVG files exist:
-```bash
-ls -la ~/.config/eww/dashboard/images/perplexity.svg
-ls -la ~/.config/eww/dashboard/images/google.svg
-```
-
-If missing:
-1. Download/create SVG icons for these services
-2. Place them in `~/.config/eww/dashboard/images/`
-3. Or replace with text-based icons in `eww.yuck`
 </details>
 
 <details>
@@ -876,7 +802,7 @@ Contributions welcome! Please:
 If you found this customization helpful:
 - ⭐ **Star** this repository
 - 🔀 **Fork** and create your own variant
-- 📢 **Share** with the r/unixporn community
+- 📢 **Share** with the linux community
 - 💬 **Post** your customized version with screenshots
 - ☕ **Support** the original author [@adi1090x](https://github.com/adi1090x)
 
@@ -888,9 +814,7 @@ If you found this customization helpful:
 
 </div>
 
-- **GitHub**: [@YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-- **Email**: your.email@example.com
-- **Reddit**: u/YOUR_REDDIT_USERNAME
+- **GitHub**: @DragonPlayz-1
 
 ---
 
