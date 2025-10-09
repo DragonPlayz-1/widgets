@@ -11,8 +11,8 @@ last_fetch_ts="${cache_dir}/.last_fetch"
 
 ## Weather data (Open-Meteo uses coordinates; no API key needed)
 UNIT="metric"    # 'metric' => °C, 'imperial' => °F
-LAT="26.7496"    # 26.7496° N
-LON="88.4434"    # 88.4434° E
+LAT="00.0000"    # Set ur own
+LON="00.0000"    # Set ur own
 
 ## Unit mapping for Open-Meteo query and degree symbol
 if [ "$UNIT" = "imperial" ]; then
