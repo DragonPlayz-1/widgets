@@ -1,0 +1,169 @@
+#!/bin/bash
+
+## Collect data
+cache_dir="$HOME/.cache/eww/weather"
+cache_weather_stat="${cache_dir}/weather-stat"
+cache_weather_degree="${cache_dir}/weather-degree"
+cache_weather_quote="${cache_dir}/weather-quote"
+cache_weather_hex="${cache_dir}/weather-hex"
+cache_weather_icon="${cache_dir}/weather-icon"
+last_fetch_ts="${cache_dir}/.last_fetch"
+
+## Weather data (Open-Meteo uses coordinates; no API key needed)
+UNIT="metric"    # 'metric' => °C, 'imperial' => °F
+LAT="26.7496"    # 26.7496° N
+LON="88.4434"    # 88.4434° E
+
+## Unit mapping for Open-Meteo query and degree symbol
+if [ "$UNIT" = "imperial" ]; then
+  TEMP_UNIT="fahrenheit"
+  DEG_SYM="°F"
+else
+  TEMP_UNIT="celsius"
+  DEG_SYM="°C"
+fi
+
+## Make cache dir
+if [ ! -d "$cache_dir" ]; then
+  mkdir -p "$cache_dir"
+fi
+
+## Defaults (sentinels)
+DEF_ICON=" "
+DEF_STAT="Weather Unavailable"
+DEF_DEG="-"
+DEF_HEX="#adadff"
+DEF_QUOTE=$'Ah well, no weather huh? \nEven if there\'s no weather, it\'s gonna be a great day!\n'
+
+## Bootstrap cache files with defaults if missing
+[ -f "$cache_weather_icon"   ] || printf "%s\n" "$DEF_ICON"  > "$cache_weather_icon"
+[ -f "$cache_weather_stat"   ] || printf "%s\n" "$DEF_STAT"  > "$cache_weather_stat"
+[ -f "$cache_weather_degree" ] || printf "%s\n" "$DEF_DEG"   > "$cache_weather_degree"
+[ -f "$cache_weather_hex"    ] || printf "%s\n" "$DEF_HEX"   > "$cache_weather_hex"
+[ -f "$cache_weather_quote"  ] || printf "%b"   "$DEF_QUOTE" > "$cache_weather_quote"
+
+## Helper: is cache stale or default?
+is_stale_or_default() {
+  # Stale if older than 10 minutes OR still has defaults
+  local stale_sec=300
+  local now ts age
+  now="$(date +%s)"
+  ts="$(stat -c %Y "$cache_weather_stat" 2>/dev/null || echo 0)"
+  age=$(( now - ts ))
+  if [ $age -ge $stale_sec ]; then
+    return 0
+  fi
+  # Default sentinels mean no real data yet
+  if grep -qxF "$DEF_STAT" "$cache_weather_stat"; then
+    return 0
+  fi
+  if grep -qxF "$DEF_DEG"  "$cache_weather_degree"; then
+    return 0
+  fi
+  return 1
+}
+
+## Fetch and write cache
+get_weather_data() {
+  local url="https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weather_code&timezone=auto&temperature_unit=${TEMP_UNIT}"
+  local weather
+  weather="$(curl -sf "$url")" || weather=""
+  echo "$weather"
+  if [ -n "$weather" ]; then
+    local weather_temp weather_code weather_icon weather_description weather_quote weather_hex
+    weather_temp="$(echo "$weather" | jq -r '.current.temperature_2m' | cut -d '.' -f 1)"
+    weather_code="$(echo "$weather" | jq -r '.current.weather_code')"
+
+    # Map Open-Meteo WMO codes -> icon/Title Case description/quote/color
+    if [ "$weather_code" = "0" ]; then
+      weather_icon=" "
+      weather_description="Clear Sky"
+      weather_quote="It's a sunny day, gonna be fun! \nDon't go wandering all by yourself though..."
+      weather_hex="#ffd86b"
+    elif [ "$weather_code" = "1" ] || [ "$weather_code" = "2" ]; then
+      weather_icon=" "
+      weather_description="Mainly/Partly Cloudy"
+      weather_quote="It's cloudy and a bit gloomy. \nMight be a good time to grab a book to read."
+      weather_hex="#adadff"
+    elif [ "$weather_code" = "3" ]; then
+      weather_icon=" "
+      weather_description="Overcast"
+      weather_quote="Skies are overcast and a bit gloomy. \nA cozy reading session could be perfect."
+      weather_hex="#adadff"
+    elif [ "$weather_code" = "45" ] || [ "$weather_code" = "48" ]; then
+      weather_icon=" "
+      weather_description="Fog/Mist"
+      weather_quote="The forecast says it's misty. \nTake care not to get lost on the way."
+      weather_hex="#84afdb"
+    elif [ "$weather_code" = "51" ] || [ "$weather_code" = "53" ] || [ "$weather_code" = "55" ] || [ "$weather_code" = "56" ] || [ "$weather_code" = "57" ]; then
+      weather_icon=" "
+      weather_description="Drizzle"
+      weather_quote="Light rain in the air. \nRamen and a window seat make a great combo."
+      weather_hex="#6b95ff"
+    elif [ "$weather_code" = "61" ] || [ "$weather_code" = "63" ] || [ "$weather_code" = "65" ] || [ "$weather_code" = "66" ] || [ "$weather_code" = "67" ]; then
+      weather_icon=" "
+      weather_description="Rain"
+      weather_quote="It's raining—great ambiance! \nGrab something warm and enjoy the sound."
+      weather_hex="#6b95ff"
+    elif [ "$weather_code" = "71" ] || [ "$weather_code" = "73" ] || [ "$weather_code" = "75" ] || [ "$weather_code" = "77" ]; then
+      weather_icon=" "
+      weather_description="Snow"
+      weather_quote="Snow is in the forecast. \nBundle up and maybe build a snowman!"
+      weather_hex="#e3e6fc"
+    elif [ "$weather_code" = "80" ] || [ "$weather_code" = "81" ] || [ "$weather_code" = "82" ]; then
+      weather_icon=" "
+      weather_description="Rain Showers"
+      weather_quote="Showers passing through. \nPerfect time for music and a hot drink."
+      weather_hex="#6b95ff"
+    elif [ "$weather_code" = "85" ] || [ "$weather_code" = "86" ]; then
+      weather_icon=" "
+      weather_description="Snow Showers"
+      weather_quote="Snow showers incoming. \nStay warm and enjoy the scenery."
+      weather_hex="#e3e6fc"
+    elif [ "$weather_code" = "95" ] || [ "$weather_code" = "96" ] || [ "$weather_code" = "99" ]; then
+      weather_icon=""
+      weather_description="Thunderstorm"
+      weather_quote="There's a storm in the forecast. \nSecure windows and stay cozy indoors."
+      weather_hex="#ffeb57"
+    else
+      weather_icon="$DEF_ICON"
+      weather_description="Cloudy"
+      weather_quote="A bit unusual—hard to forecast. \nEither way, make it a good day!"
+      weather_hex="$DEF_HEX"
+    fi
+
+    printf "%s\n" "$weather_icon"                        > "$cache_weather_icon"
+    printf "%s\n" "$weather_description"                 > "$cache_weather_stat"
+    printf "%s%s\n" "$weather_temp" "$DEG_SYM"           > "$cache_weather_degree"
+    printf "%b"   "$weather_quote"                       > "$cache_weather_quote"
+    printf "%s\n" "$weather_hex"                         > "$cache_weather_hex"
+    date +%s > "$last_fetch_ts"
+    return 0
+  else
+    # Keep defaults if fetch failed
+    return 1
+  fi
+}
+
+## Execute
+if [ "$1" = "--getdata" ]; then
+  get_weather_data
+elif [ "$1" = "--icon" ]; then
+  is_stale_or_default && get_weather_data >/dev/null 2>&1
+  cat "$cache_weather_icon"
+elif [ "$1" = "--temp" ]; then
+  is_stale_or_default && get_weather_data >/dev/null 2>&1
+  cat "$cache_weather_degree"
+elif [ "$1" = "--hex" ]; then
+  is_stale_or_default && get_weather_data >/dev/null 2>&1
+  cat "$cache_weather_hex"
+elif [ "$1" = "--stat" ]; then
+  is_stale_or_default && get_weather_data >/dev/null 2>&1
+  cat "$cache_weather_stat"
+elif [ "$1" = "--quote" ]; then
+  is_stale_or_default && get_weather_data >/dev/null 2>&1
+  head -n1 "$cache_weather_quote"
+elif [ "$1" = "--quote2" ]; then
+  is_stale_or_default && get_weather_data >/dev/null 2>&1
+  tail -n1 "$cache_weather_quote"
+fi
