@@ -10,7 +10,6 @@
   <img src="https://img.shields.io/badge/Resolution-Works_on_ANY_Display-blueviolet?style=for-the-badge&logo=windowsterminal&logoColor=white" />
   <img src="https://img.shields.io/badge/EWW-Elkowar's_Wacky_Widgets-ff69b4?style=for-the-badge&logo=linux&logoColor=white" />
   <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge&logo=gnu&logoColor=white" />
-  <img src="https://img.shields.io/badge/Status-Production-success?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Positioning-100%25_Responsive-orange?style=for-the-badge&logo=buffer&logoColor=white" />
 </p>
 
