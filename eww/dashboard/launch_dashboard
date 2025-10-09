@@ -5,10 +5,21 @@ FILE="$HOME/.cache/eww_launch.dashboard"
 CFG="$HOME/.config/eww/dashboard"
 EWW=`which eww`
 
-## Run eww daemon if not running already
-if [[ ! `pidof eww` ]]; then
-	${EWW} daemon
-	sleep 1
+## Run eww daemon if not running already (for this config), and wait until ready
+DAEMON_WAS_DOWN=0
+if ! ${EWW} --config "$CFG" list-windows >/dev/null 2>&1; then
+	DAEMON_WAS_DOWN=1
+	${EWW} --config "$CFG" daemon &
+	# wait until the daemon for this config is ready
+	for i in $(seq 1 100); do
+		${EWW} --config "$CFG" list-windows >/dev/null 2>&1 && break
+		sleep 0.1
+	done
+fi
+
+# If the daemon was down (e.g., after pkill), drop stale toggle file so first run opens
+if [[ "$DAEMON_WAS_DOWN" -eq 1 ]]; then
+	rm -f "$FILE"
 fi
 
 ## Open widgets 
@@ -22,8 +33,9 @@ run_eww() {
 		   music \
 		   github \
 		   reddit \
-		   twitter \
+		   perplexity \
 		   youtube \
+		   google \
 		   weather \
 		   apps \
 		   mail \
@@ -37,10 +49,11 @@ run_eww() {
 ## Launch or close widgets accordingly
 if [[ ! -f "$FILE" ]]; then
 	touch "$FILE"
-	run_eww
+	run_eww & notify-send "Dashboard Widget Opened."
 else
 	${EWW} --config "$CFG" close \
 					background profile system clock uptime music github \
-					reddit twitter youtube weather apps mail logout sleep reboot poweroff folders
+					reddit perplexity youtube weather apps mail google logout sleep reboot poweroff folders
 	rm "$FILE"
+	notify-send "Dashboard Widget Closed."
 fi
