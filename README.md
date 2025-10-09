@@ -228,23 +228,19 @@ All sizes use **viewport width (vw) units** - no pixels anywhere:
 <summary><b>⚙️ System Variables</b></summary>
 
 #### Changes Made:
-1. **Hostname**: Dynamic polling
-   ```lisp
-   (defpoll HOST :interval "5s" `hostname`)
-   ```
 
-2. **Volume Monitor**: **NEW** - Real-time audio volume tracking
+1. **Volume Monitor**: **NEW** - Real-time audio volume tracking
    ```lisp
    (defpoll VOLUME :interval "1s" `amixer get Master | grep -o '[0-9]*%' | head -1 | tr -d '%'`)
    ```
 
-3. **System Updates**: **NEW** - Checks both Pacman and Flatpak updates
+2. **System Updates**: **NEW** - Checks both Pacman and Flatpak updates
    ```lisp
    (defpoll UPDATES :interval "1m" `TOTAL=$(($(checkupdates | wc -l) + $(flatpak remote-ls --updates | tail -n +2 | wc -l))); 
    if [ $TOTAL -gt 0 ]; then echo "Updates Available"; else echo "No Updates Available"; fi`)
    ```
 
-4. **Removed**: Battery and brightness monitors (desktop-focused build)
+3. **Removed**: Battery and brightness monitors (desktop-focused build)
 
 **Why?** Tailored for desktop use with relevant system metrics; removed laptop-specific sensors.
 
