@@ -527,7 +527,43 @@ bindsym $mod+d exec ~/.config/eww/dashboard/launch_dashboard
 (defvar NAME "Your Actual Name")
 ```
 
-The username and profile image will be automatically detected using `whoami` - no changes needed!
+The username will be automatically detected using `whoami` - no changes needed!
+
+### Change Profile Picture
+
+The dashboard automatically detects your profile picture from SDDM faces directory.
+
+**Current configuration**:
+```lisp
+(defpoll IMAGE :interval "0" `echo "/usr/share/sddm/faces/$(whoami).face.icon"`)
+```
+
+#### Method 1: Replace the Image File (Easiest)
+```bash
+# Replace your existing profile picture
+sudo cp your-photo.png /usr/share/sddm/faces/$(whoami).face.icon
+
+# Make sure it's readable
+sudo chmod 644 /usr/share/sddm/faces/$(whoami).face.icon
+
+# Reload EWW
+eww reload
+```
+
+#### Method 2: Change the Path in eww.yuck
+```lisp
+# Edit eww.yuck (line 11) to point to your custom image location:
+(defpoll IMAGE :interval "0" `echo "/path/to/your/profile-picture.png"`)
+
+# Or use a fixed path without whoami:
+(defvar IMAGE "/home/yourusername/Pictures/profile.png")
+```
+
+**Profile Picture Tips**:
+- **Recommended size**: 180×180 pixels or larger (it will be scaled to fit)
+- **Format**: PNG, JPG, or any image format supported by EWW
+- **Shape**: Square images work best (automatically rendered as circular)
+- **Fallback**: If image is missing, the widget will show a broken image icon
 
 ### Change Background Image
 
@@ -537,28 +573,41 @@ To customize the dashboard background:
 # Replace the background image
 cp your-wallpaper.png ~/.config/eww/dashboard/images/bg.png
 
-# Or use JPG (rename to .png)
+# Or use JPG (convert to PNG)
 convert your-wallpaper.jpg ~/.config/eww/dashboard/images/bg.png
 
 # Reload EWW to apply changes
 eww reload
 ```
 
-**Background Image Tips**:
+#### **Transparent Background (Recommended!)**
+
+For a **cleaner, more modern look**, use a transparent background to let your desktop wallpaper show through:
+
+**Edit `eww.scss` (around line 9)**:
+```scss
+/** Background ***************************************/
+
+.bg {
+  background-color: transparent;  /* ← Change this line */
+  opacity: 1;
+}
+```
+
+> **💡 Pro Tip**: The transparent background looks significantly better on most setups and integrates seamlessly with your desktop environment!
+
+**Preview with Transparent Background**:
+
+<p align="center">
+  <img src="preview/dashboard.png" alt="Dashboard Preview" width="90%" />
+</p>
+
+**Background Image Tips** (if not using transparent):
 - **Recommended resolution**: Same as your display (e.g., 1920×1080, 2560×1440)
 - **Format**: PNG or JPG (converted to PNG)
 - **Name**: Must be named `bg.png` (or edit `eww.scss` line 9)
 - The image automatically scales to cover the entire screen using `background-size: cover`
 - **Fallback color**: If image fails to load, displays `#474D59` (gray-blue)
-
-**To change fallback color** (in `eww.scss`):
-```scss
-.bg {
-  background-image: url("images/bg.png");
-  background-color: #YOUR_COLOR_HERE;  /* Change this */
-  /* ... */
-}
-```
 
 ### Weather Setup (NO API KEY NEEDED!)
 
@@ -613,7 +662,11 @@ fi
 
 </div>
 
-> *Add your screenshots here once you've launched the dashboard!*
+<p align="center">
+  <img src="preview/dashboard.png" alt="Dashboard with Transparent Background" width="90%" />
+  <br>
+  <em>Dashboard with transparent background (recommended look)</em>
+</p>
 
 ---
 
@@ -698,6 +751,25 @@ eww kill
 </details>
 
 <details>
+<summary><b>Profile picture not showing</b></summary>
+
+**Check if image exists:**
+```bash
+ls -la /usr/share/sddm/faces/$(whoami).face.icon
+```
+
+**If missing, create one:**
+```bash
+sudo cp your-photo.png /usr/share/sddm/faces/$(whoami).face.icon
+sudo chmod 644 /usr/share/sddm/faces/$(whoami).face.icon
+eww reload
+```
+
+**Or change the path in eww.yuck** (line 11) to point to your custom image location.
+
+</details>
+
+<details>
 <summary><b>Weather not updating or shows "Weather Unavailable"</b></summary>
 
 **Check coordinates:**
@@ -754,9 +826,13 @@ cp /path/to/your/wallpaper.png ~/.config/eww/dashboard/images/bg.png
 eww reload
 ```
 
-**Verify file permissions:**
-```bash
-chmod 644 ~/.config/eww/dashboard/images/bg.png
+**Or use transparent background** (recommended):
+```scss
+# Edit eww.scss line 9:
+.bg {
+  background-color: transparent;
+  opacity: 1;
+}
 ```
 
 </details>
