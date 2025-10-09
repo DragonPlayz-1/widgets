@@ -549,7 +549,7 @@ UNIT="metric"  # or "imperial" for Fahrenheit
 1. **Google Maps Method**:
    - Go to https://www.google.com/maps
    - Right-click your location → "What's here?"
-   - Copy the coordinates (e.g., "26.7496, 88.4434")
+   - Copy the coordinates (e.g., "00.0000, 00.0000")
 
 2. **Command Line Method**:
    ```bash
