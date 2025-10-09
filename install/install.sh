@@ -2,10 +2,21 @@
 
 ###############################################
 # EWW Dashboard - Silent Auto-Install Script
-# No prompts, just installs everything
+# Asks sudo once at start
 ###############################################
 
 set -e
+
+# Request sudo at the start and keep it alive
+echo "This script requires sudo access for installing dependencies."
+sudo -v
+
+# Keep sudo alive in background
+while true; do
+    sudo -n true
+    sleep 50
+    kill -0 "$$" || exit
+done 2>/dev/null &
 
 # Detect package manager
 if command -v pacman &> /dev/null; then
