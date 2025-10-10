@@ -633,7 +633,7 @@ UNIT="metric"  # or "imperial" for Fahrenheit
 1. **Google Maps Method**:
    - Go to https://www.google.com/maps
    - Right-click your location → "What's here?"
-   - Copy the coordinates (e.g., "26.7496, 88.4434")
+   - Copy the coordinates (e.g., "00.0000, 00.0000")
 
 2. **Command Line Method**:
    ```bash
@@ -907,13 +907,12 @@ The dashboard works on the primary monitor (`:monitor 0`). To display on a diffe
 
 Contributions welcome! Please:
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. **Test on multiple resolutions** (minimum: 1920×1080 and 2560×1440)
+2. Create a feature branch 
+3. **Test on multiple resolutions**
 4. **Maintain 100% responsive design** (no pixel values!)
-5. **Include `:monitor 0`** in all window definitions
-6. Commit changes (`git commit -m 'Add: Amazing new feature'`)
-7. Push to branch (`git push origin feature/AmazingFeature`)
-8. Open a Pull Request with screenshots
+5. Commit changes
+6. Push to branch
+7. Open a Pull Request with screenshots
 ---
 
 <div align="center">
